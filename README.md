@@ -1,60 +1,84 @@
-# WasifZaman.js
+<p align="center">
+  <a href="https://www.wasifzaman.tech"><strong>Live site</strong></a> &middot;
+  <a href="#run-it"><strong>Run it</strong></a> &middot;
+  <a href="#editing-content"><strong>Editing content</strong></a> &middot;
+  <a href="#design-rules"><strong>Design rules</strong></a>
+</p>
 
-Personal portfolio for Wasif Zaman, live at **[wasifzaman.tech](https://www.wasifzaman.tech)**.
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16-000000" alt="Next.js 16">
+  <img src="https://img.shields.io/badge/Tailwind-v4-38BDF8" alt="Tailwind CSS v4">
+  <img src="https://img.shields.io/badge/motion-GSAP-88CE02" alt="GSAP">
+  <img src="https://img.shields.io/badge/hosted%20on-Vercel-000000" alt="Vercel">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT">
+</p>
 
-A single-page Next.js site in a neo-brutalist style. Every project on it links to
-either a running deployment or a public repository, and every claim in the copy is
-taken from the CV in `public/resume.pdf`.
+<br>
 
-## Stack
+# wasifzaman is a portfolio you use like a desktop.
 
-| Piece | What |
-|---|---|
-| Framework | Next.js 16, App Router, Turbopack |
-| Language | TypeScript |
-| Styling | Tailwind CSS v4, tokens in `app/globals.css` under `@theme inline` |
-| Animation | Framer Motion |
-| Icons | lucide-react |
-| Hosting | Vercel |
+Wasif Zaman's personal site, live at **[wasifzaman.tech](https://www.wasifzaman.tech)**.
 
-## Running it
+**If a CV is the _summary_, this site is the _working copy_: every project opens, runs or links to its code.**
+
+`/` is a dark desktop for engineering roles. Projects open in a code-editor window, with a
+Windows-style taskbar along the bottom. `/studio` is a scrolling page in the same look for web
+studio clients.
+
+**Every link returns 200. Every claim comes from the CV or the project's own README.**
+
+|        | Step      | Example                                           |
+| ------ | --------- | ------------------------------------------------- |
+| **01** | Install   | _`npm install`_                                   |
+| **02** | Run       | _`npm run dev`, then open http://localhost:3000_  |
+| **03** | Edit copy | _Change `app/lib/data.ts`; the pages follow._     |
+
+> [!TIP]
+> **🖥️ Or hand it to your agent.** Paste this into Claude Code or Codex:
+>
+> ```text
+> Clone https://github.com/Wasif-ZA/wasifzaman, run `npm install` and `npm run dev`,
+> then open http://localhost:3000 and show me the desktop and /studio.
+> ```
+
+<br>
+
+## Why this site is different
+
+|                                  |                                                                                   |
+| -------------------------------- | --------------------------------------------------------------------------------- |
+| **Links are checked first.**     | A link is added only after it returns 200. Look-alike domains are left out.       |
+| **Real output or nothing.**      | Project tiles are captures of the running thing, never stock images.              |
+| **Pipelines get a drawing.**     | A project with no interface gets a pipeline drawn by `ArchDiagram.tsx`.          |
+| **One file of copy.**            | All text lives in `app/lib/data.ts`. Components only lay it out.                  |
+| **No phone number to scrape.**   | The served CV has the mobile number redacted out of the PDF.                      |
+
+<br>
+
+## Run it
+
+Node 20 or newer.
 
 ```bash
 npm install
 npm run dev        # http://localhost:3000
-```
-
-```bash
 npm run build      # production build
 npm run lint       # eslint
 npm run typecheck  # tsc --noEmit
 ```
 
-Node 20 or newer.
+## Editing content
 
-## Layout
+All copy lives in `app/lib/data.ts`: `PROJECTS`, `EXPERIENCE`, `EDUCATION`, `CERTIFICATES`,
+`TOOLBOX`, and for the studio page `SERVICES`, `WEEK` and `STUDIO_TERMS`. A new entry in
+`PROJECTS` becomes a desktop icon, a reel card and a README in the editor. See
+`design/README.md`.
 
-```
-app/
-  page.tsx           the whole page: data at the top, sections below
-  layout.tsx         metadata, fonts
-  lib/site.ts        canonical URL, title, description (single source)
-  components/        NeoCard, NeoButton, Marquee, ProjectModal, ArchDiagram, navbar
-  globals.css        palette tokens, focus rings, reduced-motion
-  opengraph-image.tsx, sitemap.ts, robots.ts
-public/
-  projects/          project screenshots
-  resume.pdf         the CV the hero button downloads (see note below)
-```
+<details>
+<summary>Open: the served CV, and how to check it is clean</summary>
 
-The app lives at the repository root. It used to sit under `website/project/`, which
-meant Vercel needed a Root Directory override; flattening it removed that.
-
-## The served CV
-
-`public/resume.pdf` is a **web variant**: the mobile number is redacted out of the
-content stream, so it cannot be extracted by a scraper. Email, GitHub, LinkedIn and
-the site URL remain. The unredacted original lives outside this repository.
+`public/resume.pdf` is a web variant. The mobile number is redacted out of the content stream.
+Email, GitHub, LinkedIn and the site URL remain. The original lives outside this repository.
 
 If you regenerate the CV, redact it again before committing. Check with:
 
@@ -64,46 +88,58 @@ python -c "import re;from pypdf import PdfReader;print(bool(re.search(r'04\d\d',
 
 `False` means clean.
 
-## Editing content
+</details>
 
-All copy lives in the `DATA` block at the top of `app/page.tsx`: `PROJECTS`,
-`EXPERIENCE`, `EDUCATION`, `CERTIFICATES`, `TOOLBOX`, `FOCUS_AREAS`, `HERO_PROOF`.
-Nothing below that block needs touching to change what the site says.
+## How it is built
 
-Two rules the content is held to:
+<details>
+<summary>Open: stack and layout</summary>
 
-1. **A link is only added after it returns 200.** A repository name that looks like
-   it should have a deployment usually does not; `autodocs.vercel.app` and
-   `aibo.vercel.app` belong to other people, and `tryconduit.dev` no longer resolves.
-2. **A project tile shows real output or nothing.** Screenshots in `public/projects/`
-   are captures of the running thing. Projects with no interface get an `arch`
-   pipeline drawn by `components/ArchDiagram.tsx` instead of a stock image.
+| Piece | What |
+|---|---|
+| Framework | Next.js 16, App Router, Turbopack |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4, tokens in `app/globals.css` under `@theme inline` |
+| Animation | GSAP with ScrollTrigger, through `@gsap/react` |
+| Fonts | Outfit (display), Geist Mono (labels), via `next/font` |
+| Hosting | Vercel |
+
+```
+app/
+  page.tsx           engineering page (/): renders the desktop
+  studio/page.tsx    web studio page (/studio)
+  layout.tsx         metadata, fonts
+  lib/data.ts        all site copy
+  lib/site.ts        canonical URL, title, description
+  components/
+    Desktop.tsx      windows, project reel, code editor, icons, Start menu, taskbar
+    Shell.tsx        tile, clock, window frame, studio taskbar, footer
+    Motion.tsx       GSAP wrappers: ScrubText, ScaleFade, Rise, PinnedSplit, WaveTitle, FlipIn
+    ArchDiagram.tsx  pipeline drawing for projects with no interface
+  globals.css        palette tokens, focus rings, reduced-motion
+  opengraph-image.tsx, sitemap.ts, robots.ts
+public/
+  projects/          project screenshots
+  resume.pdf         the served CV
+design/              brief, design notes, link and click checks
+```
+
+</details>
 
 ## Design rules
 
-Neo-brutalist, and consistent about it:
-
-- Off-white ground `--neo-bg: #FAF9F6`, black text, hard black borders
-- `border-[3px]` for cards, buttons and inline elements; `border-[4px]` for section
-  dividers and modals
-- Offset shadows: `shadow-neo-sm`, `shadow-neo`, `shadow-neo-lg`
-- Accents: acid green `--neo-primary`, hot pink `--neo-secondary`, blue `--neo-accent`
-
-Text colour on an accent is decided by measured contrast, not by eye. White on
-`#0000FF` is 8.59:1 and fine; white on `#FF00FF` is 3.14:1 and fails WCAG AA, so hot
-pink always carries black text.
+- Ink ground `--ink: #0B0B0D`, paper text `--paper: #F4F1EA`, one theme for both pages
+- One accent, acid green `--acid: #CEFF1A`; the front window carries a hard lime shadow
+- Square corners, bold uppercase display type, Geist Mono for labels and the editor
+- Film grain over the page (`.grain`)
 
 ## Accessibility
 
-- Explicit `:focus-visible` outline on every interactive element, because the hard
-  borders swallow the native one
-- `prefers-reduced-motion` honoured in CSS and through Framer Motion's
-  `useReducedMotion`, which covers the marquee, the hero tilt, the per-letter title
-  animation and the custom cursor
-- Focus trapped, restored, and Escape-closable in both the project modal and the
-  mobile menu
-- One tab stop per project card, not two
+- An acid green `:focus-visible` outline on every interactive element
+- Windows are labelled dialogs. Esc closes the focused one and focus returns to what opened it
+- Every window's content stays in the page while closed
+- `prefers-reduced-motion` is honoured in CSS, in every GSAP wrapper, and in the letter-weight effect
 
-## Licence
+## License
 
 MIT. See [LICENSE](LICENSE).

@@ -189,3 +189,84 @@ export function PinnedSplit({
     </div>
   );
 }
+
+export type Segment = { t: string; c?: string };
+
+/** Heading whose letters rise in a wave on load. */
+export function WaveTitle({ lines, className = "" }: { lines: Segment[][]; className?: string }) {
+  const ref = useRef<HTMLHeadingElement>(null);
+
+  useGSAP(
+    () => {
+      if (reduced()) return;
+      gsap.from(".wave-letter", {
+        yPercent: 110,
+        rotate: 8,
+        opacity: 0,
+        duration: 0.9,
+        ease: "back.out(1.8)",
+        stagger: 0.035,
+        delay: 0.15,
+      });
+    },
+    { scope: ref }
+  );
+
+  const label = lines.map((l) => l.map((s) => s.t).join("")).join(" ");
+
+  return (
+    <h1 ref={ref} className={className} aria-label={label}>
+      {lines.map((line, i) => (
+        <span key={i} aria-hidden className="block">
+          {line.map((seg, j) => (
+            <span key={j} className={seg.c}>
+              {seg.t.split(/(\s+)/).map((word, w) =>
+                /^\s+$/.test(word) ? (
+                  word
+                ) : (
+                  <span key={w} className="inline-block whitespace-nowrap">
+                    {[...word].map((ch, k) => (
+                      <span key={k} className="wave-letter inline-block">
+                        {ch}
+                      </span>
+                    ))}
+                  </span>
+                )
+              )}
+            </span>
+          ))}
+        </span>
+      ))}
+    </h1>
+  );
+}
+
+/** Children flip up into place in sequence. */
+export function FlipIn({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const el = ref.current;
+      if (!el || reduced()) return;
+      gsap.from(el.children, {
+        rotationX: -70,
+        transformPerspective: 900,
+        transformOrigin: "50% 0%",
+        y: 40,
+        opacity: 0,
+        duration: 0.9,
+        ease: "power3.out",
+        stagger: 0.12,
+        scrollTrigger: { trigger: el, start: "top 82%" },
+      });
+    },
+    { scope: ref }
+  );
+
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  );
+}

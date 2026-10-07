@@ -1,6 +1,7 @@
 /*
  * All site copy lives here. Every engineering claim is checked against
- * resume.pdf; every URL returned 200 when last verified. Studio pricing comes
+ * resume.pdf or, for sprawll and Finarchitect, the project's own README and
+ * live site; every URL returned 200 when last verified. Studio pricing comes
  * from the decided price card, not from an estimate.
  */
 
@@ -16,11 +17,10 @@ export type Project = {
   imgNote?: string;
   arch?: ArchSpec;
   projectLink?: string;
+  projectLabel?: string;
   code?: string;
   altCode?: string;
   altCodeLabel?: string;
-  /** Bento weight. "lead" spans wide, "tall" spans two rows. */
-  weight?: "lead" | "tall" | "normal";
 };
 
 export const LINKS = {
@@ -31,13 +31,6 @@ export const LINKS = {
 };
 
 /* ============================ ENGINEER ============================ */
-
-export const HERO_PROOF = [
-  "C++20 3D bin-packing solver",
-  "Awards voting platform, ~300 members",
-  "4-agent BullMQ pipeline",
-  "Real-time ESP32 control",
-];
 
 export const TOOLBOX = [
   "TypeScript", "Python", "C++20", "Java", "SQL",
@@ -58,7 +51,29 @@ export const PROJECTS: Project[] = [
     code: "https://github.com/Wasif-ZA/dynamic-fit",
     altCode: "https://github.com/Wasif-ZA/DynamicSolver",
     altCodeLabel: "Solver",
-    weight: "lead",
+  },
+  {
+    title: "sprawll",
+    blurb: "Research CLI that withholds claims it can't source",
+    tech: ["Python", "WARC", "Local LLM"],
+    description:
+      "Turns a topic into a research pack where every published claim is checked against a byte-for-byte archive of its sources. A span model and a deterministic numeric guard ground each claim; anything unsupported is withheld and named, not shipped.",
+    arch: {
+      stages: ["Fetch", "WARC archive", "Harvest facts", "Draft", ["Span model", "Numeric guard"]],
+      note: "Unsupported claims are withheld",
+    },
+    projectLink: "https://pypi.org/project/sprawll/",
+    projectLabel: "PyPI",
+  },
+  {
+    title: "Finarchitect",
+    blurb: "Site for a research and consulting firm",
+    tech: ["Next.js", "three.js", "GSAP", "Tailwind"],
+    description:
+      "Designed and built the website for Finarchitect, a research and consulting firm working on financial risk, sustainable finance and governance: one home page plus seven research-area pages.",
+    imgSrc: "/projects/finarchitect.jpg",
+    imgNote: "The live site.",
+    projectLink: "https://finarchitect-ten.vercel.app",
   },
   {
     title: "Korvo",
@@ -71,7 +86,6 @@ export const PROJECTS: Project[] = [
       note: "BullMQ DAG on Redis",
     },
     code: "https://github.com/Wasif-ZA/Korvo",
-    weight: "tall",
   },
   {
     title: "UTSBDSOC",
@@ -83,7 +97,6 @@ export const PROJECTS: Project[] = [
     imgNote: "The live site.",
     projectLink: "https://utbdsoc-website.vercel.app/home",
     code: "https://github.com/UTBDSOC/UTBDSOC-website",
-    weight: "normal",
   },
   {
     title: "Bridge Opening",
@@ -95,7 +108,6 @@ export const PROJECTS: Project[] = [
     imgNote: "The live control console.",
     projectLink: "https://bridge-opening-project.vercel.app",
     code: "https://github.com/Wasif-ZA/BridgeOpeningProject",
-    weight: "normal",
   },
   {
     title: "BladeRunner",
@@ -107,7 +119,6 @@ export const PROJECTS: Project[] = [
     imgNote: "The live operator console.",
     projectLink: "https://blade-runner-flax.vercel.app",
     code: "https://github.com/Wasif-ZA/BladeRunner",
-    weight: "normal",
   },
   {
     title: "AutoDocs",
@@ -120,7 +131,6 @@ export const PROJECTS: Project[] = [
       note: "Retries on schema failure",
     },
     code: "https://github.com/Wasif-ZA/AutoDocs",
-    weight: "normal",
   },
 ];
 
@@ -137,7 +147,7 @@ export const EXPERIENCE: Experience[] = [
   {
     company: "Australian Catholic University",
     role: "Research Software Engineer Intern",
-    period: "Apr 2026 — Present",
+    period: "Apr 2026 - Present",
     location: "Institute for Positive Psychology and Education",
     points: [
       "Build a Python service on Azure Functions rendering participant PDF reports from longitudinal survey data, where thousands must be correct without a human checking each one.",
@@ -149,7 +159,7 @@ export const EXPERIENCE: Experience[] = [
   {
     company: "UTS Bangladeshi Society",
     role: "Technical Lead / IT Director",
-    period: "May 2025 — Present",
+    period: "May 2025 - Present",
     location: "Sydney",
     points: [
       "Shipped the Graamys awards platform end to end in a two-week sprint: nine categories, duplicate-vote prevention, and an audit trail.",
@@ -160,7 +170,7 @@ export const EXPERIENCE: Experience[] = [
   {
     company: "Lenovo",
     role: "Desktop Rollout Engineer",
-    period: "Apr 2026 — Present",
+    period: "Apr 2026 - Present",
     location: "Sydney",
     points: [
       "Deploy and configure enterprise desktop hardware on a Sydney CBD client site, scheduling rollouts so the business keeps running through the change.",
@@ -171,7 +181,7 @@ export const EXPERIENCE: Experience[] = [
   {
     company: "Optus",
     role: "Sales Consultant",
-    period: "Jul — Dec 2025",
+    period: "Jul - Dec 2025",
     location: "Sydney",
     points: [
       "Reviewed each customer's account and combined offers, plans and bundles into something that fit what they actually used.",
@@ -184,7 +194,7 @@ export const EXPERIENCE: Experience[] = [
 export const EDUCATION = {
   institution: "Macquarie University",
   degree: "Bachelor of Engineering (Honours), Software Engineering",
-  period: "Feb 2022 — Jun 2027",
+  period: "Feb 2022 - Jun 2027",
   detail: "Degree conferred Sep 2027.",
   coursework: [
     "Data Structures & Algorithms", "Distributed Systems", "Operating Systems",
@@ -252,6 +262,65 @@ export const SERVICES: Service[] = [
       "Per-platform framing",
       "Consistent posting cadence",
     ],
+  },
+];
+
+/* ============================== SHOP ============================== */
+
+// buy is a Stripe Payment Link; left empty, the button falls back to an email.
+export type Product = {
+  name: string;
+  price: string;
+  priceNote: string;
+  blurb: string;
+  includes: string[];
+  cta: string;
+  href?: string;
+  buy?: string;
+};
+
+export const STORE_URL = "https://store.wasifzaman.tech";
+
+export const PRODUCTS: Product[] = [
+  {
+    name: "Creator Site",
+    price: "Free",
+    priceNote: "while in beta",
+    blurb:
+      "A ready-made site for streamers. Sign in with Twitch, pick a template, and your live status, clips and links are on one page.",
+    includes: [
+      "21 templates plus 4 variants, switch any time",
+      "Live status and clips from Twitch",
+      "Your address: store.wasifzaman.tech/you",
+      "Edit it yourself, no builder",
+    ],
+    cta: "Make yours",
+    href: STORE_URL,
+  },
+  {
+    name: "Creator Site Pro",
+    price: "Add-on",
+    priceNote: "price on request during beta",
+    blurb: "Everything in Creator Site, on a domain of its own.",
+    includes: [
+      "Your own domain, or you.wasifzaman.tech",
+      "Set up for you, no DNS homework",
+      "Same editor, same templates",
+    ],
+    cta: "Ask about Pro",
+  },
+];
+
+export const CLIENT_WORK = [
+  {
+    name: "jelapiii",
+    what: "Orchi's Twitch hub, with Segments for viewer submissions",
+    href: "https://www.jelapiii.com",
+  },
+  {
+    name: "Jelarp of All Trades",
+    what: "Site for Orchi's monthly LARP stream",
+    href: "https://jelarp.vercel.app",
   },
 ];
 

@@ -3,116 +3,144 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LINKS } from "../lib/data";
 
-const ROUTES = [
-  { href: "/", label: "Engineer" },
-  { href: "/studio", label: "Studio" },
-];
+export const Tile = ({ text, tone }: { text: string; tone: "acid" | "paper" | "ink" }) => (
+  <span
+    className={`display flex h-full w-full items-center justify-center text-lg ${
+      tone === "acid" ? "bg-acid text-black" : tone === "paper" ? "bg-paper text-black" : "bg-ink-sunken text-acid"
+    }`}
+  >
+    {text}
+  </span>
+);
 
-export function Nav() {
-  const pathname = usePathname();
-  const [solid, setSolid] = useState(false);
-
+export function Clock() {
+  const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
-    const onScroll = () => setSolid(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const tick = () => setNow(new Date());
+    const first = requestAnimationFrame(tick);
+    const t = setInterval(tick, 20_000);
+    return () => {
+      cancelAnimationFrame(first);
+      clearInterval(t);
+    };
   }, []);
-
+  if (!now) return null;
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 py-4">
-      <nav
-        className={`pointer-events-auto flex w-full max-w-5xl items-center justify-between gap-4 border px-3 py-2 transition-colors duration-300 ${
-          solid
-            ? "border-[color:var(--line)] bg-[color:var(--ink-raised)]/90 backdrop-blur-xl"
-            : "border-transparent bg-transparent"
-        }`}
-      >
-        <Link href="/" className="display shrink-0 px-2 text-lg tracking-tight text-paper">
-          WZ
-        </Link>
-
-        {/* The switch is the whole navigation: two audiences, one control. */}
-        <div className="flex items-center border border-[color:var(--line-strong)] p-0.5">
-          {ROUTES.map((r) => {
-            const active = pathname === r.href;
-            return (
-              <Link
-                key={r.href}
-                href={r.href}
-                aria-current={active ? "page" : undefined}
-                className={`px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors sm:px-4 ${
-                  active ? "bg-acid text-black" : "text-muted hover:text-paper"
-                }`}
-              >
-                {r.label}
-              </Link>
-            );
-          })}
-        </div>
-
-        <a
-          href={`mailto:${LINKS.email}`}
-          className="hidden shrink-0 px-2 font-mono text-[11px] uppercase tracking-[0.14em] text-muted transition-colors hover:text-acid sm:block"
-        >
-          Get in touch
-        </a>
-      </nav>
-    </header>
+    <span className="flex flex-col items-end leading-tight text-paper">
+      <span>{now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+      <span className="text-faint">{now.toLocaleDateString([], { day: "2-digit", month: "2-digit", year: "numeric" })}</span>
+    </span>
   );
 }
 
-export function Footer({ variant }: { variant: "engineer" | "studio" }) {
-  const isStudio = variant === "studio";
+/** Static window chrome: a title bar over any content. */
+export function Frame({
+  title,
+  active = false,
+  className = "",
+  children,
+}: {
+  title: string;
+  active?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`flex flex-col border bg-ink-raised ${
+        active ? "border-acid shadow-[8px_8px_0_0_var(--acid)]" : "border-[color:var(--line-strong)]"
+      } ${className}`}
+    >
+      <div
+        className={`flex h-9 shrink-0 items-center border-b border-[color:var(--line)] bg-ink-sunken px-3 font-mono text-[11px] uppercase tracking-[0.14em] ${
+          active ? "text-acid" : "text-muted"
+        }`}
+      >
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+const TASK = "flex h-10 w-10 items-center justify-center transition-colors hover:bg-[rgba(244,241,234,0.08)]";
+
+export function StudioTaskbar() {
+  const pathname = usePathname();
+
+  // Re-scrolls to the #hash once fonts load and ScrollTrigger has re-measured its pins.
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (!id) return;
+    let frame = 0;
+    document.fonts.ready.then(() => {
+      frame = requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+        document.getElementById(id)?.scrollIntoView({ behavior: "instant" });
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [pathname]);
 
   return (
-    <footer className="relative overflow-hidden border-t border-[color:var(--line)] bg-ink-sunken px-6 py-24 md:py-32">
-      <div className="mx-auto w-full max-w-6xl">
-        <p className="mono-label mb-6">
-          {isStudio ? "Start a build" : "Open to graduate and junior roles"}
-        </p>
+    <nav
+      aria-label="Taskbar"
+      className="fixed inset-x-0 bottom-0 z-50 flex h-12 items-center justify-between border-t border-[color:var(--line)] bg-ink-sunken/90 px-2 backdrop-blur-xl"
+    >
+      <span className="hidden w-64 font-mono text-[10px] uppercase tracking-[0.14em] text-muted lg:block">
+        Websites and clips, Sydney
+      </span>
+      <div className="flex items-center gap-1">
+        <Link href="/" aria-label="Engineering desktop" className={TASK}>
+          <span className="h-7 w-7">
+            <Tile text="WZ" tone="acid" />
+          </span>
+        </Link>
+        <a href="#packages" aria-label="Packages" className={TASK}>
+          <span className="h-7 w-7">
+            <Tile text="$" tone="ink" />
+          </span>
+        </a>
+        <Link href="/shop" aria-label="Shop" className={TASK}>
+          <span className="h-7 w-7">
+            <Tile text="SH" tone="ink" />
+          </span>
+        </Link>
+        <a href={`mailto:${LINKS.email}?subject=Website%20enquiry`} aria-label="Email" className={TASK}>
+          <span className="h-7 w-7">
+            <Tile text="@" tone="ink" />
+          </span>
+        </a>
+      </div>
+      <div className="flex items-center justify-end gap-4 pr-2 font-mono text-[11px] lg:w-64">
+        <a href={LINKS.github} target="_blank" rel="noreferrer noopener" className="text-muted transition-colors hover:text-acid">
+          GitHub
+        </a>
+        <Clock />
+      </div>
+    </nav>
+  );
+}
 
+export function Footer() {
+  return (
+    <footer className="relative overflow-hidden border-t border-[color:var(--line)] bg-ink-sunken px-6 pb-32 pt-24 md:pt-32">
+      <div className="mx-auto w-full max-w-6xl">
         <h2 className="display max-w-5xl text-[clamp(2.5rem,9vw,7rem)] text-paper">
-          {isStudio ? (
-            <>
-              Let&apos;s get you
-              <br />
-              <span className="text-acid">online</span>
-            </>
-          ) : (
-            <>
-              Let&apos;s build
-              <br />
-              <span className="text-acid">something</span>
-            </>
-          )}
+          Let&apos;s get you
+          <br />
+          <span className="text-acid">online</span>
         </h2>
 
         <div className="mt-14 flex flex-wrap gap-4">
           <a
-            href={`mailto:${LINKS.email}`}
+            href={`mailto:${LINKS.email}?subject=Website%20enquiry`}
             className="border border-paper bg-paper px-7 py-4 font-mono text-xs uppercase tracking-[0.14em] text-black transition-transform hover:-translate-y-1"
           >
             {LINKS.email}
-          </a>
-          {!isStudio && (
-            <a
-              href={LINKS.resume}
-              download
-              className="border border-[color:var(--line-strong)] px-7 py-4 font-mono text-xs uppercase tracking-[0.14em] text-paper transition-colors hover:border-acid hover:text-acid"
-            >
-              Download CV
-            </a>
-          )}
-          <a
-            href={LINKS.github}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="border border-[color:var(--line-strong)] px-7 py-4 font-mono text-xs uppercase tracking-[0.14em] text-paper transition-colors hover:border-acid hover:text-acid"
-          >
-            GitHub
           </a>
           <a
             href={LINKS.linkedin}
@@ -125,14 +153,12 @@ export function Footer({ variant }: { variant: "engineer" | "studio" }) {
         </div>
 
         <div className="rule mt-20 flex flex-wrap items-center justify-between gap-4 pt-8">
-          <span className="font-mono text-[11px] text-faint">
-            © {new Date().getFullYear()} Wasif Zaman — Sydney
-          </span>
+          <span className="font-mono text-[11px] text-faint">© {new Date().getFullYear()} Wasif Zaman, Sydney</span>
           <Link
-            href={isStudio ? "/" : "/studio"}
+            href="/"
             className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted transition-colors hover:text-acid"
           >
-            {isStudio ? "See the engineering work →" : "Need a website or clips? →"}
+            See the engineering work →
           </Link>
         </div>
       </div>

@@ -1,5 +1,5 @@
 {
-  "name": "wasifzaman-portfolio",
+  "name": "wasifzaman",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -26,6 +26,6 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "description": "Personal portfolio for Wasif Zaman. Next.js 16, Tailwind v4, neo-brutalist.",
+  "description": "Personal portfolio for Wasif Zaman: a desktop you open projects on. Next.js 16, Tailwind v4, GSAP.",
   "license": "MIT"
 }

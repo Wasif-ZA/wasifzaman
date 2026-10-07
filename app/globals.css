@@ -13,7 +13,7 @@
   --acid: #CEFF1A;
 
   --muted: rgba(244, 241, 234, 0.56);
-  --faint: rgba(244, 241, 234, 0.34);
+  --faint: rgba(244, 241, 234, 0.5);
   --line: rgba(244, 241, 234, 0.14);
   --line-strong: rgba(244, 241, 234, 0.28);
 }
@@ -100,6 +100,14 @@ body {
     opacity: 0.12;
     will-change: opacity;
   }
+}
+
+.win-open {
+  animation: win-open 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes win-open {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
 }
 
 /* Hard borders swallow the native outline, so make focus explicit. */
